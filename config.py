@@ -1,0 +1,30 @@
+"""Configuration constants for CloudStrike application."""
+
+# Spacing System
+SPACING_XS = 4
+SPACING_SM = 8
+SPACING_MD = 16
+SPACING_LG = 24
+SPACING_XL = 32
+
+# Color Palette
+COLOR_BACKGROUND = "#0b0f17"
+COLOR_CARD = "#111827"
+COLOR_PRIMARY = "#00ffd5"
+COLOR_ACCENT = "#ff3c7e"
+COLOR_TEXT = "#e6f1ff"
+COLOR_WARNING = "#ffb020"
+COLOR_CRITICAL = "#ff4d4d"
+COLOR_BORDER = "#1f2937"
+
+# Font
+FONT_FAMILY = "JetBrains Mono, Consolas, monospace"
+FONT_SIZE_NORMAL = 10
+FONT_SIZE_HEADER = 14
+FONT_SIZE_TITLE = 18
+
+# UI Dimensions
+SIDEBAR_WIDTH = 200
+INPUT_LABEL_WIDTH = 150
+WINDOW_MIN_WIDTH = 1200
+WINDOW_MIN_HEIGHT = 700

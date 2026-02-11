@@ -1,0 +1,9 @@
+[
+  {
+    "timestamp": "2026-02-11T10:59:46.416448",
+    "security_score": 100,
+    "risk_level": "Low",
+    "findings_count": 1,
+    "attacks_count": 0
+  }
+]

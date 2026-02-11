@@ -1,0 +1,79 @@
+/* CloudStrike Global Theme Stylesheet */
+
+* {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+QWidget {
+    background-color: #0b0f17;
+    color: #e6f1ff;
+}
+
+QScrollArea {
+    background-color: #0b0f17;
+    border: none;
+}
+
+QScrollArea > QWidget > QWidget {
+    background-color: #0b0f17;
+}
+
+QScrollArea QWidget {
+    background-color: #0b0f17;
+}
+
+QFrame {
+    background-color: #0b0f17;
+}
+
+QTextEdit {
+    background-color: #0b0f17;
+    color: #e6f1ff;
+}
+
+QPlainTextEdit {
+    background-color: #0b0f17;
+    color: #e6f1ff;
+}
+
+QScrollBar:vertical {
+    background-color: #111827;
+    width: 12px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #1f2937;
+    border-radius: 6px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #00ffd5;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar:horizontal {
+    background-color: #111827;
+    height: 12px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #1f2937;
+    border-radius: 6px;
+    min-width: 20px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #00ffd5;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
