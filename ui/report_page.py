@@ -14,7 +14,6 @@ class ReportPage(QWidget):
         """Initialize report page."""
         super().__init__(parent)
         self.findings = []
-        self.attacks = []
         self.current_result = {}
         self.setup_ui()
         
@@ -77,14 +76,13 @@ class ReportPage(QWidget):
         
     def update_findings(self, result: dict):
         """
-        Update report with new findings and attack simulations.
+        Update report with new findings and remediation.
         
         Args:
-            result: Dictionary with 'findings', 'attacks', 'risk', and 'remediation'
+            result: Dictionary with 'findings', 'risk', and 'remediation'
         """
         self.current_result = result
         self.findings = result.get('findings', [])
-        self.attacks = result.get('attacks', [])
         risk = result.get('risk', {})
         remediation = result.get('remediation', [])
         
@@ -93,7 +91,7 @@ class ReportPage(QWidget):
             if item.widget():
                 item.widget().deleteLater()
         
-        if not self.findings and not self.attacks:
+        if not self.findings:
             self.empty_label = QLabel("No findings yet. Run a scan to see results.")
             self.empty_label.setStyleSheet(f"""
                 color: {config.COLOR_TEXT}88;
@@ -111,28 +109,20 @@ class ReportPage(QWidget):
                 summary_card = self.create_summary_card(risk)
                 self.findings_layout.addWidget(summary_card)
             
-            if remediation:
-                remediation_header = SectionHeader("🛠️ Auto-Remediation Scripts")
-                self.findings_layout.addWidget(remediation_header)
-                
-                for script in remediation:
-                    card = self.create_remediation_card(script)
-                    self.findings_layout.addWidget(card)
-            
-            if self.attacks:
-                attack_header = SectionHeader("⚔️ Attack Simulations")
-                self.findings_layout.addWidget(attack_header)
-                
-                for attack in self.attacks:
-                    card = self.create_attack_card(attack)
-                    self.findings_layout.addWidget(card)
-            
             if self.findings:
                 findings_header = SectionHeader("🔍 Security Findings")
                 self.findings_layout.addWidget(findings_header)
                 
                 for finding in self.findings:
                     card = self.create_finding_card(finding)
+                    self.findings_layout.addWidget(card)
+            
+            if remediation:
+                remediation_header = SectionHeader("🛠️ Auto-Remediation Scripts")
+                self.findings_layout.addWidget(remediation_header)
+                
+                for script in remediation:
+                    card = self.create_remediation_card(script)
                     self.findings_layout.addWidget(card)
         
         self.findings_layout.addStretch()
@@ -193,77 +183,6 @@ class ReportPage(QWidget):
             header_layout.addWidget(remediation_label)
         
         card.add_layout(header_layout)
-        
-        return card
-    
-    def create_attack_card(self, attack: dict) -> CyberCard:
-        """
-        Create an attack simulation card.
-        
-        Args:
-            attack: Attack dictionary
-            
-        Returns:
-            Configured CyberCard widget
-        """
-        card = CyberCard()
-        
-        content_layout = QVBoxLayout()
-        content_layout.setSpacing(config.SPACING_SM)
-        
-        title_label = QLabel(attack["title"])
-        title_label.setStyleSheet(f"""
-            color: {config.COLOR_ACCENT};
-            font-family: {config.FONT_FAMILY};
-            font-size: {config.FONT_SIZE_HEADER}pt;
-            font-weight: bold;
-        """)
-        content_layout.addWidget(title_label)
-        
-        badges_layout = QVBoxLayout()
-        badges_layout.setSpacing(config.SPACING_XS)
-        
-        severity_badge = StatusBadge(attack["severity"], attack["severity"].lower())
-        cloud_badge = StatusBadge(attack["cloud"], "info")
-        
-        badges_layout.addWidget(severity_badge)
-        badges_layout.addWidget(cloud_badge)
-        
-        content_layout.addLayout(badges_layout)
-        
-        steps_label = QLabel("Attack Chain:")
-        steps_label.setStyleSheet(f"""
-            color: {config.COLOR_TEXT};
-            font-family: {config.FONT_FAMILY};
-            font-size: {config.FONT_SIZE_NORMAL}pt;
-            font-weight: bold;
-            margin-top: {config.SPACING_SM}px;
-        """)
-        content_layout.addWidget(steps_label)
-        
-        for idx, step in enumerate(attack.get("steps", []), 1):
-            step_label = QLabel(f"{idx}. {step}")
-            step_label.setWordWrap(True)
-            step_label.setStyleSheet(f"""
-                color: {config.COLOR_TEXT}cc;
-                font-family: {config.FONT_FAMILY};
-                font-size: {config.FONT_SIZE_NORMAL}pt;
-                padding-left: {config.SPACING_MD}px;
-            """)
-            content_layout.addWidget(step_label)
-        
-        impact_label = QLabel(f"⚠️ Impact: {attack.get('impact', 'Unknown')}")
-        impact_label.setWordWrap(True)
-        impact_label.setStyleSheet(f"""
-            color: {config.COLOR_CRITICAL};
-            font-family: {config.FONT_FAMILY};
-            font-size: {config.FONT_SIZE_NORMAL}pt;
-            margin-top: {config.SPACING_SM}px;
-            font-weight: bold;
-        """)
-        content_layout.addWidget(impact_label)
-        
-        card.add_layout(content_layout)
         
         return card
     

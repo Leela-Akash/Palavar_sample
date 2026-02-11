@@ -7,8 +7,8 @@ from PySide6.QtCore import Qt
 import config
 
 from ui.dashboard import DashboardPage
-from ui.credentials_page import CredentialsPage
-from ui.scan_page import ScanPage
+from ui.cloud_setup_scan_page import CloudSetupScanPage
+from ui.attack_page import AttackPage
 from ui.report_page import ReportPage
 
 
@@ -54,18 +54,17 @@ class MainWindow(QMainWindow):
 
         self.pages = QStackedWidget()
         self.dashboard_page = DashboardPage()
-        self.credentials_page = CredentialsPage()
-        self.scan_page = ScanPage()
+        self.cloud_setup_scan_page = CloudSetupScanPage()
+        self.attack_page = AttackPage()
         self.report_page = ReportPage()
 
         self.pages.addWidget(self.dashboard_page)
-        self.pages.addWidget(self.credentials_page)
-        self.pages.addWidget(self.scan_page)
+        self.pages.addWidget(self.cloud_setup_scan_page)
+        self.pages.addWidget(self.attack_page)
         self.pages.addWidget(self.report_page)
 
-        self.scan_page.set_credentials_callback(self.credentials_page.get_credentials)
-        self.scan_page.scan_completed.connect(self.on_scan_complete)
-        self.scan_page.scan_started.connect(self.on_scan_started)
+        self.cloud_setup_scan_page.scan_completed.connect(self.on_scan_complete)
+        self.cloud_setup_scan_page.scan_started.connect(self.on_scan_started)
 
         content_layout.addWidget(self.pages)
         main_layout.addLayout(content_layout)
@@ -105,8 +104,8 @@ class MainWindow(QMainWindow):
 
         nav_items = [
             ("📊 Dashboard", 0),
-            ("🔑 Credentials", 1),
-            ("🔍 Scan Center", 2),
+            ("☁️ Cloud Setup & Scan", 1),
+            ("⚔️ Attack Simulation", 2),
             ("📋 Reports", 3)
         ]
 
@@ -149,8 +148,8 @@ class MainWindow(QMainWindow):
 
         titles = [
             "Security Overview",
-            "Cloud Credentials",
-            "Scan Center",
+            "Cloud Setup & Scan",
+            "Attack Simulation",
             "Security Reports"
         ]
         self.set_page_title(titles[page_idx])
@@ -240,6 +239,7 @@ class MainWindow(QMainWindow):
 
         ScanHistory.save_scan(result)
         self.dashboard_page.update_stats(result)
+        self.attack_page.update_attacks(result.get('attacks', []))
         self.report_page.update_findings(result)
 
         self.last_scan_time = datetime.now().strftime("%H:%M:%S")
@@ -250,6 +250,14 @@ class MainWindow(QMainWindow):
         self.status_badge.setup_style("info")
 
         findings_count = len(result.get('findings', []))
+        attacks_count = len(result.get('attacks', []))
+        
+        # Add activity logs
+        self.dashboard_page.add_activity("⚔️ Attack paths generated")
+        self.dashboard_page.add_activity("📊 Risk score calculated")
+        self.dashboard_page.add_activity("🛠️ Remediation scripts created")
+        
         show_toast(self, f"Scan complete! Found {findings_count} issues")
 
-        self.navigate_to(3)
+        # Auto-navigate to Attack Simulation page
+        self.navigate_to(2)
