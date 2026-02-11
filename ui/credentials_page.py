@@ -121,7 +121,12 @@ class CredentialsPage(QWidget):
     def save_credentials(self):
         """Save cloud credentials."""
         logger.info("Saving cloud credentials...")
-        QMessageBox.information(self, "Success", "Credentials saved successfully!")
+        from components.toast import show_toast
+        show_toast(self, "Credentials saved successfully!")
+        
+        # Add to dashboard activity
+        if hasattr(self.parent(), 'dashboard_page'):
+            self.parent().dashboard_page.add_activity("🔑 Credentials updated")
     
     def get_credentials(self) -> dict:
         """Get all configured credentials."""

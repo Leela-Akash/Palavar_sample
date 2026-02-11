@@ -477,36 +477,113 @@ class ReportPage(QWidget):
     def export_json(self):
         """Export report as JSON."""
         if not self.current_result:
-            from PySide6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "No Data", "No scan results to export. Run a scan first.")
+            from components.toast import show_toast
+            show_toast(self, "No scan results to export. Run a scan first.")
             return
         
-        try:
-            from core.report_exporter import ReportExporter
-            filename = ReportExporter.export_json(self.current_result)
-            
-            from PySide6.QtWidgets import QMessageBox
-            QMessageBox.information(self, "Export Successful", f"Report exported to:\n{filename}")
-        except Exception as e:
-            from PySide6.QtWidgets import QMessageBox
-            QMessageBox.critical(self, "Export Failed", f"Failed to export JSON:\n{str(e)}")
+        from PySide6.QtWidgets import QFileDialog
+        from datetime import datetime
+        import json
+        
+        default_name = f"cloudstrike_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save JSON Report",
+            default_name,
+            "JSON Files (*.json)"
+        )
+        
+        if file_path:
+            try:
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(self.current_result, f, indent=4)
+                
+                from components.toast import show_toast
+                show_toast(self, f"Report saved: {file_path}")
+            except Exception as e:
+                from components.toast import show_toast
+                show_toast(self, f"Export failed: {str(e)}")
     
     def export_pdf(self):
         """Export report as PDF."""
         if not self.current_result:
-            from PySide6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "No Data", "No scan results to export. Run a scan first.")
+            from components.toast import show_toast
+            show_toast(self, "No scan results to export. Run a scan first.")
             return
         
-        try:
-            from core.report_exporter import ReportExporter
-            filename = ReportExporter.export_pdf(self.current_result)
-            
-            from PySide6.QtWidgets import QMessageBox
-            QMessageBox.information(self, "Export Successful", f"Report exported to:\n{filename}")
-        except ImportError:
-            from PySide6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "Missing Dependency", "PDF export requires reportlab.\nInstall with: pip install reportlab")
-        except Exception as e:
-            from PySide6.QtWidgets import QMessageBox
-            QMessageBox.critical(self, "Export Failed", f"Failed to export PDF:\n{str(e)}")
+        from PySide6.QtWidgets import QFileDialog
+        from datetime import datetime
+        
+        default_name = f"cloudstrike_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save PDF Report",
+            default_name,
+            "PDF Files (*.pdf)"
+        )
+        
+        if file_path:
+            try:
+                from reportlab.lib.pagesizes import letter
+                from reportlab.lib import colors
+                from reportlab.lib.styles import getSampleStyleSheet
+                from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+                from reportlab.lib.units import inch
+                
+                doc = SimpleDocTemplate(file_path, pagesize=letter)
+                story = []
+                styles = getSampleStyleSheet()
+                
+                # Title
+                title = Paragraph("<b>CloudStrike Security Report</b>", styles['Title'])
+                story.append(title)
+                story.append(Spacer(1, 0.2*inch))
+                
+                # Timestamp
+                timestamp = Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal'])
+                story.append(timestamp)
+                story.append(Spacer(1, 0.3*inch))
+                
+                # Risk Summary
+                risk = self.current_result.get('risk', {})
+                summary_data = [
+                    ['Security Score', str(risk.get('security_score', 0))],
+                    ['Risk Level', risk.get('risk_level', 'Unknown')],
+                    ['Total Findings', str(len(self.current_result.get('findings', [])))],
+                    ['Attack Paths', str(len(self.current_result.get('attacks', [])))]  
+                ]
+                
+                summary_table = Table(summary_data, colWidths=[3*inch, 2*inch])
+                summary_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+                    ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, -1), 12),
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                ]))
+                
+                story.append(summary_table)
+                story.append(Spacer(1, 0.3*inch))
+                
+                # Findings
+                story.append(Paragraph("<b>Security Findings</b>", styles['Heading2']))
+                story.append(Spacer(1, 0.1*inch))
+                
+                for finding in self.current_result.get('findings', [])[:10]:
+                    finding_text = f"<b>{finding['title']}</b> [{finding['severity']}]<br/>{finding['description']}"
+                    story.append(Paragraph(finding_text, styles['Normal']))
+                    story.append(Spacer(1, 0.1*inch))
+                
+                doc.build(story)
+                
+                from components.toast import show_toast
+                show_toast(self, f"PDF saved: {file_path}")
+                
+            except ImportError:
+                from components.toast import show_toast
+                show_toast(self, "PDF export requires reportlab. Install: pip install reportlab")
+            except Exception as e:
+                from components.toast import show_toast
+                show_toast(self, f"Export failed: {str(e)}")

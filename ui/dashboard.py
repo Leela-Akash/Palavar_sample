@@ -1,9 +1,10 @@
 """Dashboard page with overview statistics."""
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout, QListWidget, QListWidgetItem
 from PySide6.QtCore import Qt
 import config
-from components.cyber_card import CyberCard
 from components.section_header import SectionHeader
+from components.metric_card import MetricCard
+from components.cyber_card import CyberCard
 
 
 class DashboardPage(QWidget):
@@ -12,7 +13,8 @@ class DashboardPage(QWidget):
     def __init__(self, parent=None):
         """Initialize dashboard page."""
         super().__init__(parent)
-        self.stat_cards = {}
+        self.metric_cards = {}
+        self.activities = []
         self.setup_ui()
         
     def setup_ui(self):
@@ -26,35 +28,108 @@ class DashboardPage(QWidget):
         )
         layout.setSpacing(config.SPACING_LG)
         
-        header = SectionHeader("Security Dashboard")
+        # Section title
+        header = SectionHeader("Security Overview")
         layout.addWidget(header)
-        
-        self.stats_layout = QGridLayout()
-        self.stats_layout.setSpacing(config.SPACING_MD)
         
         # Load scan history
         from core.scan_history import ScanHistory
         history_stats = ScanHistory.get_stats()
         
-        stats = [
-            ("security_score", "Security Score", "--", config.COLOR_PRIMARY),
-            ("total_findings", "Total Findings", "--", config.COLOR_WARNING),
-            ("attack_paths", "Attack Paths", "--", config.COLOR_CRITICAL),
-            ("risk_level", "Risk Level", "--", config.COLOR_TEXT)
+        # Row of 4 metric cards
+        metrics_layout = QHBoxLayout()
+        metrics_layout.setSpacing(config.SPACING_MD)
+        
+        metrics = [
+            ("security_score", "🛡️", "Security Score", "--", config.COLOR_PRIMARY),
+            ("total_findings", "🔍", "Findings", "--", config.COLOR_WARNING),
+            ("attack_paths", "⚔️", "Attack Paths", "--", config.COLOR_CRITICAL),
+            ("risk_level", "⚠️", "Risk Level", "--", config.COLOR_ACCENT)
         ]
         
-        for idx, (key, title, value, color) in enumerate(stats):
-            card = self.create_stat_card(title, value, color)
-            self.stat_cards[key] = card
-            row = idx // 2
-            col = idx % 2
-            self.stats_layout.addWidget(card, row, col)
+        self.metric_cards = {}
+        for key, icon, label, value, color in metrics:
+            card = MetricCard(icon, label, value, color)
+            self.metric_cards[key] = card
+            metrics_layout.addWidget(card)
         
-        layout.addLayout(self.stats_layout)
+        layout.addLayout(metrics_layout)
+        
+        # Two-column grid
+        grid_layout = QHBoxLayout()
+        grid_layout.setSpacing(config.SPACING_MD)
+        
+        # Left column: Security Insights
+        insights_card = CyberCard("Security Insights")
+        
+        insights_layout = QVBoxLayout()
+        insights_layout.setSpacing(config.SPACING_SM)
+        
+        # Placeholder for charts
+        chart_label = QLabel("📊 Security Score Distribution")
+        chart_label.setStyleSheet(f"""
+            color: {config.COLOR_TEXT};
+            font-family: {config.FONT_FAMILY};
+            font-size: {config.FONT_SIZE_NORMAL}pt;
+            padding: {config.SPACING_XL}px;
+            background-color: {config.COLOR_BACKGROUND};
+            border: 1px dashed {config.COLOR_BORDER};
+            border-radius: 4px;
+        """)
+        chart_label.setAlignment(Qt.AlignCenter)
+        insights_layout.addWidget(chart_label)
+        
+        findings_label = QLabel("📈 Findings by Cloud Provider")
+        findings_label.setStyleSheet(f"""
+            color: {config.COLOR_TEXT};
+            font-family: {config.FONT_FAMILY};
+            font-size: {config.FONT_SIZE_NORMAL}pt;
+            padding: {config.SPACING_XL}px;
+            background-color: {config.COLOR_BACKGROUND};
+            border: 1px dashed {config.COLOR_BORDER};
+            border-radius: 4px;
+        """)
+        findings_label.setAlignment(Qt.AlignCenter)
+        insights_layout.addWidget(findings_label)
+        
+        insights_card.add_layout(insights_layout)
+        grid_layout.addWidget(insights_card, 2)
+        
+        # Right column: Recent Activity
+        activity_card = CyberCard("Recent Activity")
+        
+        self.activity_list = QListWidget()
+        self.activity_list.setStyleSheet(f"""
+            QListWidget {{
+                background-color: {config.COLOR_BACKGROUND};
+                border: 1px solid {config.COLOR_BORDER};
+                border-radius: 4px;
+                padding: {config.SPACING_SM}px;
+                font-family: {config.FONT_FAMILY};
+                font-size: {config.FONT_SIZE_NORMAL}pt;
+            }}
+            QListWidget::item {{
+                color: {config.COLOR_TEXT};
+                padding: {config.SPACING_SM}px;
+                border-bottom: 1px solid {config.COLOR_BORDER};
+            }}
+            QListWidget::item:hover {{
+                background-color: {config.COLOR_CARD};
+            }}
+        """)
+        
+        # Add initial welcome message
+        self.add_activity("✨ CloudStrike initialized")
+        self.add_activity("🛡️ Ready to scan cloud infrastructure")
+        
+        activity_card.add_widget(self.activity_list)
+        grid_layout.addWidget(activity_card, 1)
+        
+        layout.addLayout(grid_layout)
         
         # Scan history info
-        history_layout = QVBoxLayout()
-        history_layout.setSpacing(config.SPACING_SM)
+        history_layout = QHBoxLayout()
+        history_layout.setSpacing(config.SPACING_MD)
         
         self.last_scan_label = QLabel(f"Last Scan: {history_stats['last_scan']}")
         self.last_scan_label.setStyleSheet(f"""
@@ -72,43 +147,8 @@ class DashboardPage(QWidget):
         """)
         history_layout.addWidget(self.total_scans_label)
         
+        history_layout.addStretch()
         layout.addLayout(history_layout)
-        layout.addStretch()
-        
-    def create_stat_card(self, title: str, value: str, color: str) -> CyberCard:
-        """
-        Create a statistics card.
-        
-        Args:
-            title: Stat title
-            value: Stat value
-            color: Value color
-            
-        Returns:
-            Configured CyberCard widget
-        """
-        card = CyberCard()
-        
-        title_label = QLabel(title)
-        title_label.setStyleSheet(f"""
-            color: {config.COLOR_TEXT}88;
-            font-family: {config.FONT_FAMILY};
-            font-size: {config.FONT_SIZE_NORMAL}pt;
-        """)
-        
-        value_label = QLabel(value)
-        value_label.setObjectName("value_label")
-        value_label.setStyleSheet(f"""
-            color: {color};
-            font-family: {config.FONT_FAMILY};
-            font-size: 32pt;
-            font-weight: bold;
-        """)
-        
-        card.add_widget(title_label)
-        card.add_widget(value_label)
-        
-        return card
     
     def update_stats(self, result: dict):
         """
@@ -118,6 +158,7 @@ class DashboardPage(QWidget):
             result: Scan result with findings, attacks, and risk
         """
         from core.scan_history import ScanHistory
+        from datetime import datetime
         
         risk = result.get('risk', {})
         findings = result.get('findings', [])
@@ -143,27 +184,39 @@ class DashboardPage(QWidget):
         }
         risk_color = risk_colors.get(risk_level, config.COLOR_TEXT)
         
-        # Update cards
-        self._update_card_value("security_score", str(security_score), score_color)
-        self._update_card_value("total_findings", str(len(findings)), config.COLOR_WARNING)
-        self._update_card_value("attack_paths", str(len(attacks)), config.COLOR_CRITICAL)
-        self._update_card_value("risk_level", risk_level, risk_color)
+        # Update metric cards
+        self.metric_cards["security_score"].update_value(str(security_score), score_color)
+        self.metric_cards["total_findings"].update_value(str(len(findings)), config.COLOR_WARNING)
+        self.metric_cards["attack_paths"].update_value(str(len(attacks)), config.COLOR_CRITICAL)
+        self.metric_cards["risk_level"].update_value(risk_level, risk_color)
         
         # Update history labels
         history_stats = ScanHistory.get_stats()
         self.last_scan_label.setText(f"Last Scan: {history_stats['last_scan']}")
         self.total_scans_label.setText(f"Total Scans: {history_stats['total_scans']}")
-    
-    def _update_card_value(self, key: str, value: str, color: str):
-        """Update a stat card's value and color."""
-        card = self.stat_cards.get(key)
-        if card:
-            value_label = card.findChild(QLabel, "value_label")
-            if value_label:
-                value_label.setText(value)
-                value_label.setStyleSheet(f"""
-                    color: {color};
-                    font-family: {config.FONT_FAMILY};
-                    font-size: 32pt;
-                    font-weight: bold;
-                """)
+        
+        # Add activity to feed
+        self.add_activity(f"🔍 Scan completed - {len(findings)} findings")
+        self.add_activity(f"📊 Risk score: {security_score}")
+        self.add_activity(f"⚔️ {len(attacks)} attack paths identified")
+
+    def add_activity(self, message: str):
+        """
+        Add activity to feed.
+        
+        Args:
+            message: Activity message
+        """
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        activity = f"{message} | {timestamp}"
+        
+        item = QListWidgetItem(activity)
+        self.activity_list.insertItem(0, item)
+        self.activities.insert(0, activity)
+        
+        # Keep only last 15 activities
+        while self.activity_list.count() > 15:
+            self.activity_list.takeItem(self.activity_list.count() - 1)
+        while len(self.activities) > 15:
+            self.activities.pop()
