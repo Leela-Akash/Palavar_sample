@@ -54,5 +54,145 @@
     "risk_level": "Medium",
     "findings_count": 1,
     "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T00:44:26.605682",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T00:47:44.679657",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T00:51:03.700706",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T00:54:05.148582",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T01:12:37.168170",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T01:15:41.488113",
+    "security_score": 100,
+    "risk_level": "Low",
+    "findings_count": 0,
+    "attacks_count": 0
+  },
+  {
+    "timestamp": "2026-02-12T16:54:17.897538",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T21:18:08.640054",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T21:25:42.376156",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T21:45:05.555337",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T22:17:10.255501",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T22:22:47.675935",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T22:25:35.204809",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T22:35:39.458690",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T22:46:37.146082",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T22:52:01.902692",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T22:55:55.987334",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T22:59:46.845912",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T23:06:51.097194",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
+  },
+  {
+    "timestamp": "2026-02-12T23:14:29.586499",
+    "security_score": 62,
+    "risk_level": "Medium",
+    "findings_count": 1,
+    "attacks_count": 1
   }
 ]

@@ -323,6 +323,15 @@ class CloudSetupScanPage(QWidget):
         layout.addWidget(self.aws_access_key)
         layout.addWidget(self.aws_secret_key)
         layout.addWidget(self.aws_region)
+        
+        clear_btn = GlowButton("Clear AWS Credentials", primary=False)
+        clear_btn.clicked.connect(lambda: (
+            self.aws_access_key.clear(),
+            self.aws_secret_key.clear(),
+            self.aws_region.clear()
+        ))
+        layout.addWidget(clear_btn)
+        
         layout.addStretch()
         
         return widget
@@ -341,6 +350,15 @@ class CloudSetupScanPage(QWidget):
         layout.addWidget(self.azure_tenant_id)
         layout.addWidget(self.azure_client_id)
         layout.addWidget(self.azure_client_secret)
+        
+        clear_btn = GlowButton("Clear Azure Credentials", primary=False)
+        clear_btn.clicked.connect(lambda: (
+            self.azure_tenant_id.clear(),
+            self.azure_client_id.clear(),
+            self.azure_client_secret.clear()
+        ))
+        layout.addWidget(clear_btn)
+        
         layout.addStretch()
         
         return widget
@@ -357,6 +375,14 @@ class CloudSetupScanPage(QWidget):
         
         layout.addWidget(self.gcp_project_id)
         layout.addWidget(self.gcp_service_account)
+        
+        clear_btn = GlowButton("Clear GCP Credentials", primary=False)
+        clear_btn.clicked.connect(lambda: (
+            self.gcp_project_id.clear(),
+            self.gcp_service_account.clear()
+        ))
+        layout.addWidget(clear_btn)
+        
         layout.addStretch()
         
         return widget

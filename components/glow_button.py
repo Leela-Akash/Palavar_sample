@@ -38,7 +38,6 @@ class GlowButton(QPushButton):
             }}
             QPushButton:hover {{
                 background-color: {color}22;
-                box-shadow: 0 0 20px {color};
             }}
             QPushButton:pressed {{
                 background-color: {color}44;

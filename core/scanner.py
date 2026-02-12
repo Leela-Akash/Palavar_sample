@@ -7,6 +7,7 @@ from cloud.gcp_scanner import GCPScanner
 from core.attack_engine import AttackEngine
 from core.risk_engine import RiskEngine
 from remediation.remediation_engine import RemediationEngine
+from core.ai_engine import ai_analyzer
 
 logger = logging.getLogger(__name__)
 
@@ -126,12 +127,33 @@ def run_cloud_scan(credentials: Dict[str, Dict[str, str]]) -> Dict[str, any]:
     
     logger.info(f"Scan complete. Scanned {len(scanned_clouds)} clouds, found {len(all_findings)} total findings.")
     
+    # Generate rule-based attack paths
     attack_engine = AttackEngine()
     attack_paths = attack_engine.generate_attack_paths(all_findings)
     
+    # Generate AI-powered attack scenarios (if enabled)
+    logger.info("Generating AI-powered attack scenarios...")
+    ai_attacks = ai_analyzer.generate_ai_attack_scenarios(all_findings)
+    if ai_attacks:
+        attack_paths.extend(ai_attacks)
+        logger.info(f"Added {len(ai_attacks)} AI-generated attack scenarios")
+    
+    # Risk analysis
     risk_engine = RiskEngine()
     risk_analysis = risk_engine.analyze(all_findings, attack_paths)
     
+    # Enhance risk summary with AI
+    if ai_analyzer.enabled:
+        logger.info("Generating AI-powered risk summary...")
+        ai_summary = ai_analyzer.generate_ai_risk_summary(
+            all_findings, 
+            attack_paths, 
+            risk_analysis['security_score']
+        )
+        risk_analysis['ai_summary'] = ai_summary
+        risk_analysis['summary'] = ai_summary  # Replace default summary
+    
+    # Generate remediation scripts
     remediation_engine = RemediationEngine()
     remediation_scripts = remediation_engine.generate(all_findings)
     
